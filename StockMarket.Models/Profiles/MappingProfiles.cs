@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using StockMarket.Models.DTO_s.StockDtos;
+using StockMarket.Models.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +13,9 @@ namespace StockMarket.Models.Profiles
     {
         public MappingProfiles()
         {
-                
+            CreateMap<Stock, StockDto>().ReverseMap();
+            CreateMap<Stock, CreateStockDto>().ReverseMap();
+
         }
     }
 }
