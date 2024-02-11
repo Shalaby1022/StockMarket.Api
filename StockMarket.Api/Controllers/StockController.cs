@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using StockMarket.DataService.Interfaces;
 using StockMarket.Models.DTO_s.StockDtos;
+using StockMarket.Models.ManualMappingUsingExtensionMethods;
 using StockMarket.Models.Models;
 
 namespace StockMarket.Api.Controllers
@@ -34,19 +35,7 @@ namespace StockMarket.Api.Controllers
             try
             {
                 var stocks = await _unitOfWork.StockRepository.GetAllAsync();
-                //var mappedStocks = _mapper.Map<StockDto>(stocks);
-                // Manual Mapping Till I fix the issue of automapper 
-
-                var mappedStocks = stocks.Select(s => new StockDto
-                {
-                    Id = s.Id,
-                    Symbol = s.Symbol,
-                    CompanyName = s.CompanyName,
-                    Purchase = s.Purchase,
-                    LastDiv = s.LastDiv,
-                    Industry = s.Industry,
-                    MarketCap = s.MarketCap
-                }).ToList();
+                var mappedStocks = stocks.Select(s => s.ToStockDto());
 
                 return Ok(mappedStocks);
             }
@@ -73,16 +62,7 @@ namespace StockMarket.Api.Controllers
 
                 if (stock == null) return NotFound();
 
-                var mappedStock = new StockDto
-                {
-                    Id = stock.Id,
-                    Symbol = stock.Symbol,
-                    CompanyName = stock.CompanyName,
-                    Purchase = stock.Purchase,
-                    LastDiv = stock.LastDiv,
-                    Industry = stock.Industry,
-                    MarketCap = stock.MarketCap
-                };
+                var mappedStock = stock.ToStockDto();
 
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
@@ -114,16 +94,7 @@ namespace StockMarket.Api.Controllers
             {
                 if (createStockDto == null) return BadRequest(ModelState);
 
-                //var stockMap = _mapper.Map<Stock>(createStockDto);
-                var stockMap = new Stock
-                {
-                    Symbol = createStockDto.Symbol,
-                    CompanyName = createStockDto.CompanyName,
-                    Purchase = createStockDto.Purchase,
-                    LastDiv = createStockDto.LastDiv,
-                    Industry = createStockDto.Industry,
-                    MarketCap = createStockDto.MarketCap
-                };
+                var stockMap = createStockDto.ToStockFromCreating();
 
                 if (stockMap == null)
                 {
@@ -187,20 +158,10 @@ namespace StockMarket.Api.Controllers
         }
 
 
-        [HttpPatch("{stockId}")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-
-        public async Task<IActionResult> PartiallyUpdatingStocks([FromRoute]  int stockId , [FromBody] UpdateStockDto updateStockDto
-                                                                                           , JsonPatchDocument<>)
-
-
-        {
-
-        }
-
-
+        //[HttpPatch("{stockId}")]
+        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+        //[ProducesResponseType(StatusCodes.Status204NoContent)]
+        //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
 
 
 
