@@ -15,6 +15,8 @@ namespace StockMarket.Models.Profiles
         {
             CreateMap<Stock, StockDto>().ReverseMap();
             CreateMap<Stock, CreateStockDto>().ReverseMap();
+            CreateMap<Stock , UpdateStockDto>().ReverseMap();
+
 
         }
     }

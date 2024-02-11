@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Azure;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using StockMarket.DataService.Interfaces;
 using StockMarket.Models.DTO_s.StockDtos;
@@ -32,7 +34,19 @@ namespace StockMarket.Api.Controllers
             try
             {
                 var stocks = await _unitOfWork.StockRepository.GetAllAsync();
-                var mappedStocks = _mapper.Map<StockDto>(stocks);
+                //var mappedStocks = _mapper.Map<StockDto>(stocks);
+                // Manual Mapping Till I fix the issue of automapper 
+
+                var mappedStocks = stocks.Select(s => new StockDto
+                {
+                    Id = s.Id,
+                    Symbol = s.Symbol,
+                    CompanyName = s.CompanyName,
+                    Purchase = s.Purchase,
+                    LastDiv = s.LastDiv,
+                    Industry = s.Industry,
+                    MarketCap = s.MarketCap
+                }).ToList();
 
                 return Ok(mappedStocks);
             }
@@ -59,7 +73,16 @@ namespace StockMarket.Api.Controllers
 
                 if (stock == null) return NotFound();
 
-                var mappedStock = _mapper.Map<StockDto>(stock);
+                var mappedStock = new StockDto
+                {
+                    Id = stock.Id,
+                    Symbol = stock.Symbol,
+                    CompanyName = stock.CompanyName,
+                    Purchase = stock.Purchase,
+                    LastDiv = stock.LastDiv,
+                    Industry = stock.Industry,
+                    MarketCap = stock.MarketCap
+                };
 
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
@@ -91,7 +114,17 @@ namespace StockMarket.Api.Controllers
             {
                 if (createStockDto == null) return BadRequest(ModelState);
 
-                var stockMap = _mapper.Map<Stock>(createStockDto);
+                //var stockMap = _mapper.Map<Stock>(createStockDto);
+                var stockMap = new Stock
+                {
+                    Symbol = createStockDto.Symbol,
+                    CompanyName = createStockDto.CompanyName,
+                    Purchase = createStockDto.Purchase,
+                    LastDiv = createStockDto.LastDiv,
+                    Industry = createStockDto.Industry,
+                    MarketCap = createStockDto.MarketCap
+                };
+
                 if (stockMap == null)
                 {
                     ModelState.AddModelError("", "Mapping failed. Unable to create stock.");
@@ -110,6 +143,63 @@ namespace StockMarket.Api.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
+        [HttpPut("{stockId}")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateExistenceStock([FromRoute] int stockId, [FromBody] UpdateStockDto updateStockDto)
+        {
+            if (updateStockDto == null) return BadRequest(ModelState);
+
+            if (!ModelState.IsValid || stockId < 1)
+            {
+                _logger.LogError($"Invalid Put attempt in {nameof(UpdateExistenceStock)}");
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var existingStock = await _unitOfWork.StockRepository.GetByIdAsync(c => c.Id == stockId);
+
+                if (existingStock == null)
+                {
+                    return NotFound();
+                }
+
+                // Perform manual mapping
+                existingStock.Symbol = updateStockDto.Symbol;
+                existingStock.CompanyName = updateStockDto.CompanyName;
+                existingStock.Purchase = updateStockDto.Purchase;
+                existingStock.LastDiv = updateStockDto.LastDiv;
+                existingStock.Industry = updateStockDto.Industry;
+                existingStock.MarketCap = updateStockDto.MarketCap;
+
+                _unitOfWork.StockRepository.Update(existingStock);
+                await _unitOfWork.SaveAsync();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred while updating stock with ID {stockId}.");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+
+        [HttpPatch("{stockId}")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+
+        public async Task<IActionResult> PartiallyUpdatingStocks([FromRoute]  int stockId , [FromBody] UpdateStockDto updateStockDto
+                                                                                           , JsonPatchDocument<>)
+
+
+        {
+
+        }
+
 
 
 
