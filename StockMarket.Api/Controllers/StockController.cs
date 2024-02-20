@@ -110,7 +110,7 @@ namespace StockMarket.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"An error occurred while creating and adding new country {nameof(createStockDto)}.");
+                _logger.LogError(ex, $"An error occurred while creating and adding new stock {nameof(createStockDto)}.");
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -164,9 +164,47 @@ namespace StockMarket.Api.Controllers
         //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
 
 
+        [HttpDelete("{stockId}")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+
+        public async Task<IActionResult> DeleteStock(int stockId)
+        {
+            if (stockId == null) { return NotFound(); }
+
+            if (!ModelState.IsValid || stockId < 0)
+            {
+                _logger.LogError($"Invalid Delete attempt in {nameof(DeleteStock)}");
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var deletedStock = await _unitOfWork.StockRepository.GetByIdAsync(q => q.Id == stockId);
+
+                if (deletedStock == null)
+                {
+                    return NotFound();
+                }
+
+                _unitOfWork.StockRepository.Delete(deletedStock);
+                await _unitOfWork.SaveAsync();
+                return NoContent();
+
+            }
+
+
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred while Deleting existing Stock {nameof(DeleteStock)}.");
+                return StatusCode(500, "Internal server error! Please Try again");
+
+            }
 
 
 
 
+        }
     }
 }
