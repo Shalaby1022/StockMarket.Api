@@ -6,6 +6,7 @@ using StockMarket.DataService.Interfaces;
 using StockMarket.Models.DTO_s.StockDtos;
 using StockMarket.Models.ManualMappingUsingExtensionMethods;
 using StockMarket.Models.Models;
+using StockMarket.Utility.ResourceParameters;
 
 namespace StockMarket.Api.Controllers
 {
@@ -30,11 +31,11 @@ namespace StockMarket.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Stock>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllStocks()
+        public async Task<IActionResult> GetAllStocks([FromQuery] StockResourceParameters<Stock> resourceParameters )
         {
             try
             {
-                var stocks = await _unitOfWork.StockRepository.GetAllAsync();
+                var stocks = await _unitOfWork.StockRepository.GetAllPagedAsync(resourceParameters);
                 var mappedStocks = stocks.Select(s => s.ToStockDto());
 
                 return Ok(mappedStocks);
@@ -47,7 +48,7 @@ namespace StockMarket.Api.Controllers
             }
         }
 
-        [HttpGet("{stockId}")]
+        [HttpGet("{stockId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -114,7 +115,7 @@ namespace StockMarket.Api.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
-        [HttpPut("{stockId}")]
+        [HttpPut("{stockId:int}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -164,7 +165,7 @@ namespace StockMarket.Api.Controllers
         //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
 
 
-        [HttpDelete("{stockId}")]
+        [HttpDelete("{stockId:int}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

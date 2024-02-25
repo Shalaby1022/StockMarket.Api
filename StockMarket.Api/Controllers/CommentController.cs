@@ -5,6 +5,7 @@ using StockMarket.Models.Models;
 using StockMarket.Models.ManualMappingUsingExtensionMethods;
 using StockMarket.Models.DTO_s.StockDtos;
 using StockMarket.Models.DTO_s.CommentDtos;
+using StockMarket.Utility.ResourceParameters;
 
 
 namespace StockMarket.Api.Controllers
@@ -15,7 +16,6 @@ namespace StockMarket.Api.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<CommentController> _logger;
-        private readonly IMapper _mapper;
 
         public CommentController(IUnitOfWork unitOfWork
                                             , ILogger<CommentController> logger
@@ -29,11 +29,11 @@ namespace StockMarket.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Comment>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllComments()
+        public async Task<IActionResult> GetAllComments([FromQuery] StockResourceParameters<Comment> resourceParameters)
         {
             try
             {
-                var comments = await _unitOfWork.CommentRepository.GetAllAsync();
+                var comments = await _unitOfWork.CommentRepository.GetAllPagedAsync(resourceParameters);
                 var mappedComments = comments.Select(c => c.ToCommentDto());
 
                 return Ok(mappedComments);
@@ -47,7 +47,7 @@ namespace StockMarket.Api.Controllers
             }
         }
 
-        [HttpGet("{commentId}")]
+        [HttpGet("{commentId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -115,7 +115,7 @@ namespace StockMarket.Api.Controllers
             }
         }
 
-        [HttpPut("{commentId}")]
+        [HttpPut("{commentId:int}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -149,7 +149,7 @@ namespace StockMarket.Api.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
-        [HttpDelete("{commentId}")]
+        [HttpDelete("{commentId:int}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
