@@ -1,4 +1,6 @@
-﻿using System;
+﻿using PagedList;
+using StockMarket.Utility.ResourceParameters;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -9,7 +11,15 @@ namespace StockMarket.DataService.Interfaces
 {
     public interface IGenericRepository<T> where T : class
     {
-        Task<IEnumerable<T>> GetAllAsync();
+        Task<IEnumerable<T>> GetAllAsync(
+            Expression<Func<T , bool>> expression = null ,
+            Func<IQueryable<T> ,  IOrderedQueryable<T>> OrderBy = null ,
+            IEnumerable<string> Includes = null);
+
+        Task<IPagedList<T>> GetAllPagedAsync(
+            StockResourceParameters<T> resourceParameters,
+            List<string> Include = null);
+
 
         Task<T> GetByIdAsync(Expression<Func<T, bool>> expression);
         Task CreateAsync(T entity);

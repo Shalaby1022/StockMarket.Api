@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using PagedList;
 using StockMarket.DataService.Data;
 using StockMarket.DataService.Interfaces;
-using System;
-using System.Collections.Generic;
+using StockMarket.Utility.ResourceParameters;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -46,7 +47,49 @@ namespace StockMarket.DataService.Repository
             return await query.AsNoTracking().ToListAsync();
         }
 
-        public  async Task<T> GetByIdAsync(Expression<Func<T, bool>> expression)
+        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T , bool>> expression = null, 
+            Func<IQueryable<T>, IOrderedQueryable<T>> OrderBy = null,
+            IEnumerable<string> Includes = null)
+        {
+            IQueryable<T> query = _dbSet;
+            
+            if(expression != null)
+            {
+                query = query.Where(expression);
+            }
+
+            if(Includes != null)
+            {
+                foreach(var IncludeProperty in Includes)
+                {
+                    query = query.Include(IncludeProperty);
+                }
+            }
+            
+            if(OrderBy!= null)
+            {
+                query = OrderBy(query);
+            }
+
+            return await query.AsNoTracking().ToListAsync();
+        }
+
+        public async Task<IPagedList<T>> GetAllPagedAsync(StockResourceParameters<T> resourceParameters, List<string> Include = null)
+        {
+            IQueryable<T> query = _dbSet;
+
+            if (Include != null)
+            {
+                foreach (var IncludeProperty in Include)
+                {
+                    query = query.Include(IncludeProperty);
+                }
+            }
+            
+            return  query.AsNoTracking().ToPagedList(resourceParameters.PageNumber , resourceParameters.PageSize);
+        }
+
+        public async Task<T> GetByIdAsync(Expression<Func<T, bool>> expression)
         {
             IQueryable<T> query = _dbSet;
 

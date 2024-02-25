@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StockMarket.DataService.Interfaces
 {
-    internal class IPostRepository
+    public class IPostRepository
     {
     }
 }
