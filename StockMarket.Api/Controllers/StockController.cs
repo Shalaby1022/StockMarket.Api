@@ -7,6 +7,7 @@ using StockMarket.Models.DTO_s.StockDtos;
 using StockMarket.Models.ManualMappingUsingExtensionMethods;
 using StockMarket.Models.Models;
 using StockMarket.Utility.ResourceParameters;
+using System.Linq;
 
 namespace StockMarket.Api.Controllers
 {
@@ -36,6 +37,9 @@ namespace StockMarket.Api.Controllers
             try
             {
                 var stocks = await _unitOfWork.StockRepository.GetAllPagedAsync(resourceParameters);
+
+               
+
                 var mappedStocks = stocks.Select(s => s.ToStockDto());
 
                 return Ok(mappedStocks);
