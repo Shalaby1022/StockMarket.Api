@@ -22,5 +22,13 @@ namespace StockMarket.Models.ManualMappingUsingExtensionMethods
             };
         }
 
+        public static NewUserDto ToAppUserFromLogin(this LoginDto loginDto)
+        {
+            return new NewUserDto
+            {
+                Email = loginDto.Email,
+            };
+        }
+
     }
 }
