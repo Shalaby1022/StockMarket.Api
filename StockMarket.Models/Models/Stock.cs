@@ -36,6 +36,9 @@ namespace StockMarket.Models.Models
         // navigation prop 
         public List<Comment> Comments { get; set; } = new List<Comment>();
 
+        public List<ApplicationUser> ApplicationUsers { get; set; } = new List<ApplicationUser>();
+        public List<Portfolio> Portfolios { get; set; } = new List<Portfolio>();
+
 
     }
 }

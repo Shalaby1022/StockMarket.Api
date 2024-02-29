@@ -30,6 +30,9 @@ namespace StockMarket.Models.Models
         public int StockId { get; set; }
         public Stock? Stock { get; set; }
 
+        public string UserId { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
+
 
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StockMarket.DataService.Data;
 
@@ -11,9 +12,11 @@ using StockMarket.DataService.Data;
 namespace StockMarket.DataService.Migrations
 {
     [DbContext(typeof(StockDbContext))]
-    partial class StockDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240227230027_ManyToManyRealtionPortofolio")]
+    partial class ManyToManyRealtionPortofolio
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,15 +54,15 @@ namespace StockMarket.DataService.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "4f6d0c6b-681a-4c20-a4dd-b50b29b09531",
-                            ConcurrencyStamp = "1e27f3cb-9b37-45f2-97a8-6fec819bcd60",
+                            Id = "74a8bab5-ba33-445e-a207-0948a92dd141",
+                            ConcurrencyStamp = "397ff49c-03a4-4cb0-bd11-0eddba4e2509",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "a4a03a79-c99f-4a9c-975d-088ca81b384b",
-                            ConcurrencyStamp = "a89d009a-e119-401f-a388-4fd9213a7f7f",
+                            Id = "1f6f25cb-130a-42ba-b8eb-ebad8068139c",
+                            ConcurrencyStamp = "e4d91ab1-f20e-49f0-a87f-804fc1c207ab",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -252,9 +255,6 @@ namespace StockMarket.DataService.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -271,13 +271,7 @@ namespace StockMarket.DataService.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("StockId");
 
@@ -296,7 +290,7 @@ namespace StockMarket.DataService.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Portfolios");
+                    b.ToTable("Portfolio");
                 });
 
             modelBuilder.Entity("StockMarket.Models.Models.Stock", b =>
@@ -404,17 +398,11 @@ namespace StockMarket.DataService.Migrations
 
             modelBuilder.Entity("StockMarket.Models.Models.Comment", b =>
                 {
-                    b.HasOne("StockMarket.Models.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("ApplicationUserId");
-
                     b.HasOne("StockMarket.Models.Models.Stock", "Stock")
                         .WithMany("Comments")
                         .HasForeignKey("StockId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("ApplicationUser");
 
                     b.Navigation("Stock");
                 });

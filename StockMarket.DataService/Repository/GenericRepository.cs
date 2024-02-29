@@ -85,7 +85,7 @@ namespace StockMarket.DataService.Repository
                     query = query.Include(IncludeProperty);
                 }
             }
-            
+
             return  query.AsNoTracking().ToPagedList(resourceParameters.PageNumber , resourceParameters.PageSize);
         }
 

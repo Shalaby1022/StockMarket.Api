@@ -16,12 +16,14 @@ namespace StockMarket.DataService.Repository
         private readonly StockDbContext _context;
         private IGenericRepository<Stock> _stockRepository;
         private IGenericRepository<Comment> _commentRepository;
+        private IGenericRepository<Portfolio> _portfolioRepository;
         public UnitOfWorkRepository(StockDbContext context)
         {
             _context = context;
         }
         public IGenericRepository<Stock> StockRepository => _stockRepository ?? new GenericRepository<Stock>(_context);
         public IGenericRepository<Comment> CommentRepository => _commentRepository ?? new GenericRepository<Comment>(_context);
+        public IGenericRepository<Portfolio> PortfolioRepository => _portfolioRepository ?? new GenericRepository<Portfolio>(_context);
 
         public void Dispose()
         {
