@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace StockMarket.DataService.Interfaces
 {
-    public class IPostRepository
+    public interface IStockRepository<Stock> : IGenericRepository<StockMarket.Models.Models.Stock>
     {
+        Task<IEnumerable<Stock>> GetAllStocksWithInclusion();
+
+
+
     }
 }

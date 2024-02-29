@@ -11,6 +11,8 @@ namespace StockMarket.DataService.Interfaces
     {
         IGenericRepository<Comment> CommentRepository { get; }
         IGenericRepository<Stock> StockRepository { get; }
+        IGenericRepository<Portfolio> PortfolioRepository { get; }
+
         Task SaveAsync();
     }
 }
