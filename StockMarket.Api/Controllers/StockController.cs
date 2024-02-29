@@ -18,14 +18,17 @@ namespace StockMarket.Api.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<StockController> _logger;
         private readonly IMapper _mapper;
+        private readonly IStockRepository<Stock> _stockRepository;
 
-        public StockController(IUnitOfWork unitOfWork
-                                          , ILogger<StockController> logger
-                                          , IMapper mapper)
+        public StockController(  IUnitOfWork unitOfWork
+                               , ILogger<StockController> logger
+                               , IMapper mapper
+                               , IStockRepository<Stock> stockRepository)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _stockRepository = stockRepository ?? throw new ArgumentNullException(nameof(stockRepository));
         }
 
         [HttpGet]
@@ -36,9 +39,7 @@ namespace StockMarket.Api.Controllers
         {
             try
             {
-                var stocks = await _unitOfWork.StockRepository.GetAllPagedAsync(resourceParameters);
-
-               
+                var stocks = await _stockRepository.GetAllStocksWithInclusion();
 
                 var mappedStocks = stocks.Select(s => s.ToStockDto());
 
